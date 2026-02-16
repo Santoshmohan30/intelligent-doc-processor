@@ -1,8 +1,7 @@
-"""
-Main FastAPI application entry point
-"""
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from backend.api.routes import documents
+from backend.database import init_db
 
 app = FastAPI(
     title="Intelligent Document Processor",
@@ -10,29 +9,26 @@ app = FastAPI(
     version="0.1.0",
 )
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure properly in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Initialize database
+init_db()
+
+# Include routers
+app.include_router(documents.router, prefix="/api/v1")
+
 
 @app.get("/")
 async def root():
-    """Health check endpoint"""
     return {"status": "healthy", "service": "document-processor", "version": "0.1.0"}
 
 
 @app.get("/health")
 async def health_check():
-    """Detailed health check"""
-    return {"status": "ok", "checks": {"database": "ok", "ml_service": "ok"}}
-
-
-if __name__ == "__main__":
-    import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    return {"status": "ok", "checks": {"database": "ok", "ocr_service": "ok"}}
