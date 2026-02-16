@@ -1,118 +1,162 @@
-# 📄 Intelligent Document Processing Pipeline
+# Intelligent Document Processor
 
-![Python](https://img.shields.io/badge/python-3.11+-blue.svg)
-![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
+A FastAPI service that accepts image/PDF uploads, runs OCR using Tesseract, stores the extracted text and metadata in SQLite, and allows retrieval by document ID.
 
-> Production-grade document intelligence system with MLOps best practices
-
-## 🎯 Overview
-
-An end-to-end document processing pipeline that extracts, classifies, and structures information from PDFs and images using machine learning and OCR technology.
-
-### Key Features
-
-- 📝 **Multi-format Support** - Process PDFs, images (PNG, JPG)
-- 🤖 **ML-Powered Classification** - Automatic document type detection
-- 🔍 **Entity Extraction** - Extract dates, amounts, names, emails
-- 🚀 **Production-Ready API** - RESTful API with async processing
-- 📊 **MLOps Integration** - Model versioning, experiment tracking
-- 🔬 **Comprehensive Testing** - Unit, integration, and E2E tests
-- 📈 **Monitoring** - Prometheus metrics and Grafana dashboards
-
-## 🏗️ Architecture
-```
-┌─────────────┐      ┌──────────────┐      ┌─────────────┐
-│   Client    │─────▶│   FastAPI    │─────▶│  ML Models  │
-│  (React)    │      │   Backend    │      │  (PyTorch)  │
-└─────────────┘      └──────────────┘      └─────────────┘
-                            │
-                            ▼
-                     ┌──────────────┐
-                     │   SQLite DB  │
-                     └──────────────┘
-```
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Python 3.11+
-- Docker (optional)
-- Git
-
-### Installation
-```bash
-# Clone repository
-git clone https://github.com/YOUR_USERNAME/intelligent-doc-processor.git
-cd intelligent-doc-processor
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run development server
-uvicorn backend.main:app --reload
-```
-
-Visit `http://localhost:8000/docs` for API documentation.
-
-## 📁 Project Structure
-```
-intelligent-doc-processor/
-├── backend/           # FastAPI application
-├── frontend/          # React application
-├── ml-pipeline/       # ML training & experiments
-├── infrastructure/    # Docker, K8s configs
-├── tests/            # Test suites
-└── docs/             # Documentation
-```
-
-## 🧪 Testing
-```bash
-# Run all tests
-pytest
-
-# With coverage
-pytest --cov=backend --cov-report=html
-
-# Run specific test suite
-pytest tests/unit/
-```
-
-## 📊 Tech Stack
-
-**Backend:** FastAPI, Python 3.11, SQLAlchemy
-**ML/AI:** PyTorch, Transformers, Tesseract OCR, spaCy
-**MLOps:** MLflow, DVC
-**DevOps:** Docker, GitHub Actions
-**Monitoring:** Prometheus, Grafana
-**Testing:** pytest, coverage.py
-
-## 🛣️ Roadmap
-
-- [x] Project setup
-- [ ] OCR service implementation
-- [ ] Document classifier
-- [ ] Entity extraction
-- [ ] REST API
-- [ ] Frontend UI
-- [ ] CI/CD pipeline
-- [ ] Monitoring & logging
-
-## 📝 License
-
-MIT License - see LICENSE file for details
-
-## 👤 Author
-
-**Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)
+This project is intentionally backend-focused and emphasizes correctness, clean structure, and testability.
 
 ---
 
-⭐ Star this repo if you find it useful!
+## What it does (current state)
+
+- Upload documents (PNG, JPG, PDF)
+- Extract text using Tesseract OCR
+- Store OCR output and metadata in SQLite
+- Retrieve processed documents by ID
+- Unit tests using pytest
+- Code quality enforced via pre-commit (black, flake8, mypy)
+
+---
+
+## API Endpoints
+
+### Upload a document
+`POST /api/v1/documents/upload`
+
+Processes a document and stores OCR results.
+
+### Get a document
+`GET /api/v1/documents/{document_id}`
+
+Returns stored metadata and extracted text.
+
+---
+
+## Tech Stack
+
+- **Backend:** FastAPI
+- **Database:** SQLite + SQLAlchemy
+- **OCR:** Tesseract (pytesseract)
+- **PDF Processing:** pdf2image (Poppler)
+- **Testing:** pytest
+- **Code Quality:** black, flake8, mypy, pre-commit
+
+---
+
+## Setup
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/Santoshmohan30/intelligent-doc-processor.git
+cd intelligent-doc-processor
+```
+
+### 2. Create and activate virtual environment
+```bash
+python -m venv venv
+source venv/bin/activate
+```
+
+### 3. Install Python dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Install system dependencies (macOS)
+```bash
+brew install tesseract poppler
+```
+
+Verify installation:
+```bash
+tesseract --version
+```
+
+---
+
+## Run the server
+```bash
+uvicorn backend.main:app --reload
+```
+
+Open Swagger UI:
+```
+http://127.0.0.1:8000/docs
+```
+
+---
+
+## Example Usage
+
+### Upload a document
+```bash
+curl -X POST "http://127.0.0.1:8000/api/v1/documents/upload" \
+  -H "accept: application/json" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@test.png"
+```
+
+Example response:
+```json
+{
+  "message": "Document processed successfully",
+  "document": {
+    "id": 1,
+    "filename": "test.png",
+    "file_type": ".png",
+    "file_size": 1543769,
+    "extracted_text": "...",
+    "processing_time": 0.55,
+    "status": "completed",
+    "created_at": "2026-02-16T02:22:44.817992"
+  }
+}
+```
+
+### Fetch stored document
+```bash
+curl http://127.0.0.1:8000/api/v1/documents/1
+```
+
+---
+
+## Testing
+```bash
+pytest -v
+```
+
+---
+
+## Project Structure
+
+```
+backend/
+├── api/
+│   ├── routes/documents.py
+│   └── models/schemas.py
+├── database/
+│   ├── models.py
+│   └── __init__.py
+├── services/
+│   └── ocr_service.py
+├── main.py
+backend/tests/
+└── unit/
+    ├── test_api.py
+    └── test_ocr_service.py
+```
+
+---
+
+## Roadmap
+
+- Document classification
+- Entity extraction (dates, amounts, names)
+- Background processing
+- Docker and CI pipeline
+
+---
+
+## Author
+
+**Santosh Mohan Jena**  
+GitHub: https://github.com/Santoshmohan30
