@@ -43,3 +43,20 @@ dist/
 build/
 *.egg-info/
 doc_processor.db
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Local env
+.env
+
+# Local DB / uploads
+doc_processor.db
+test.db
+uploads/
+
+# OS
+.DS_Store
