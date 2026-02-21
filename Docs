@@ -1,1 +1,169 @@
+# Intelligent Document Processor – Technical Overview
 
+## 1. Project Purpose
+
+The Intelligent Document Processor is a backend system designed to:
+
+- Accept document uploads (PDF, PNG, JPG)
+- Extract text using OCR (Tesseract)
+- Store extracted data in a database
+- Return structured JSON responses via API
+
+This project demonstrates backend architecture, API design, file handling, database persistence, and structured engineering practices.
+
+---
+
+## 2. System Flow (End-to-End Pipeline)
+
+### Step 1 – User Upload
+A client uploads a document through:
+
+POST /api/v1/documents/upload
+
+The request is received by the FastAPI backend.
+
+---
+
+### Step 2 – API Layer
+FastAPI validates the request and forwards the file to the OCR service.
+
+The API is responsible for:
+- Request validation
+- Routing
+- Returning structured responses
+
+---
+
+### Step 3 – OCR Processing (Tesseract)
+
+Tesseract OCR:
+- Analyzes image pixels
+- Recognizes characters
+- Converts image data into readable text
+
+The extracted text is returned to the backend service layer.
+
+---
+
+### Step 4 – Database Storage
+
+The system stores:
+- filename
+- file size
+- file type
+- extracted text
+- processing time
+- timestamps
+- status
+
+SQLite is used as the database.
+SQLAlchemy is used as the ORM layer.
+
+---
+
+### Step 5 – JSON Response
+
+The API returns:
+
+{
+  "message": "Document processed successfully",
+  "document": {
+    "id": 1,
+    "filename": "example.png",
+    "extracted_text": "...",
+    "status": "completed"
+  }
+}
+
+This ensures structured communication between backend and client.
+
+---
+
+## 3. Folder Structure Explanation
+
+### backend/
+Contains the core application logic.
+
+- api/ → Defines endpoints (routes)
+- services/ → Business logic (OCR processing)
+- database/ → Data models and DB setup
+- main.py → Application entry point
+
+---
+
+### docs/
+Contains documentation and system explanation files.
+
+---
+
+### tests/
+Contains unit and integration tests.
+
+---
+
+### infrastructure/
+Reserved for Docker, monitoring, deployment configurations.
+
+---
+
+## 4. Key Technologies Used
+
+- Python 3.11
+- FastAPI (API framework)
+- Uvicorn (ASGI server)
+- Tesseract OCR
+- SQLAlchemy (ORM)
+- SQLite (Database)
+- Pytest (Testing)
+- Git & GitHub (Version control)
+
+---
+
+## 5. Why This Architecture Matters
+
+This project follows separation of concerns:
+
+- API layer handles communication
+- Service layer handles logic
+- Database layer handles persistence
+
+This modular structure makes the system:
+- Maintainable
+- Testable
+- Scalable
+- Production-ready
+
+---
+
+## 6. Engineering Practices Demonstrated
+
+- Virtual environment isolation
+- Dependency freezing (requirements.txt)
+- Git-based version control
+- Structured commits
+- Clean folder organization
+- Documentation-driven development
+
+---
+
+## 7. Future Improvements
+
+- Add document classification model
+- Add entity extraction (dates, totals)
+- Add asynchronous background processing
+- Add frontend UI
+- Add Docker deployment
+
+---
+
+## Conclusion
+
+The Intelligent Document Processor demonstrates a complete backend document-processing pipeline using professional software engineering practices.
+
+It reflects understanding of:
+- API architecture
+- File handling
+- OCR integration
+- Database modeling
+- Modular code design
+- Deployment structure
