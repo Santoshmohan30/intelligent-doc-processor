@@ -1,169 +1,131 @@
-# Intelligent Document Processor – Technical Overview
+# Intelligent Document Processor – Backend Architecture & Engineering Overview
 
-## 1. Project Purpose
+## 1. Project Objective
 
-The Intelligent Document Processor is a backend system designed to:
+The Intelligent Document Processor is a modular backend system designed to:
 
 - Accept document uploads (PDF, PNG, JPG)
-- Extract text using OCR (Tesseract)
-- Store extracted data in a database
-- Return structured JSON responses via API
+- Perform Optical Character Recognition (OCR) using Tesseract
+- Persist extracted content in a relational database
+- Expose structured responses via a RESTful API
 
-This project demonstrates backend architecture, API design, file handling, database persistence, and structured engineering practices.
+The goal of this project was not just to “run OCR,” but to build a production-style backend architecture around it. The focus was on clean structure, modular design, separation of concerns, and engineering discipline similar to real-world backend systems.
 
 ---
 
-## 2. System Flow (End-to-End Pipeline)
+## 2. End-to-End System Flow
 
-### Step 1 – User Upload
-A client uploads a document through:
+The system follows a layered backend architecture:
+
+Client → API Layer → Service Layer → Database Layer → JSON Response
+
+### Step 1 – Client Upload
+
+A user uploads a document via:
 
 POST /api/v1/documents/upload
 
-The request is received by the FastAPI backend.
+The file is sent as multipart/form-data and received by FastAPI.
 
 ---
 
-### Step 2 – API Layer
-FastAPI validates the request and forwards the file to the OCR service.
+### Step 2 – API Layer (Routing & Validation)
 
-The API is responsible for:
-- Request validation
-- Routing
-- Returning structured responses
+The API layer is responsible for:
 
----
+- Validating file input
+- Restricting supported file types
+- Delegating work to the service layer
+- Structuring the final response
 
-### Step 3 – OCR Processing (Tesseract)
+FastAPI was selected because:
 
-Tesseract OCR:
-- Analyzes image pixels
-- Recognizes characters
-- Converts image data into readable text
+- It provides automatic validation using Pydantic
+- It generates OpenAPI documentation automatically
+- It supports asynchronous execution (ASGI)
+- It is production-ready and lightweight
 
-The extracted text is returned to the backend service layer.
-
----
-
-### Step 4 – Database Storage
-
-The system stores:
-- filename
-- file size
-- file type
-- extracted text
-- processing time
-- timestamps
-- status
-
-SQLite is used as the database.
-SQLAlchemy is used as the ORM layer.
+The API layer contains no business logic. It strictly manages communication.
 
 ---
 
-### Step 5 – JSON Response
+### Step 3 – Service Layer (Business Logic)
 
-The API returns:
+The service layer handles:
 
+- Saving uploaded files
+- Calling the OCR engine
+- Measuring processing time
+- Handling exceptions
+- Returning structured processing results
+
+This separation ensures:
+
+- Clean architecture
+- Easier testing
+- Replaceability (OCR engine can be swapped later)
+- Better maintainability
+
+---
+
+### Step 4 – OCR Engine (Tesseract)
+
+Tesseract performs Optical Character Recognition by:
+
+- Analyzing image pixel structures
+- Detecting character patterns
+- Converting images into readable text
+
+It transforms unstructured image data into machine-readable text.
+
+Tesseract was chosen because:
+
+- It is open-source and stable
+- It integrates easily with Python
+- It does not require external API calls
+- It allows full local control of processing
+
+---
+
+### Step 5 – Database Layer (Persistence)
+
+The project uses:
+
+- SQLite (for development)
+- SQLAlchemy ORM (for abstraction)
+
+The Document model stores:
+
+- ID (primary key)
+- Filename
+- File size
+- File type
+- Extracted text
+- Processing time
+- Status
+- Created and updated timestamps
+
+Using SQLAlchemy provides:
+
+- Database abstraction
+- Clean schema modeling
+- Easier migration to PostgreSQL or other databases
+- Reduced raw SQL complexity
+
+---
+
+### Step 6 – JSON Response
+
+After processing, the API returns structured JSON:
+
+```json
 {
   "message": "Document processed successfully",
   "document": {
     "id": 1,
-    "filename": "example.png",
+    "filename": "receipt.png",
     "extracted_text": "...",
+    "processing_time": 0.53,
     "status": "completed"
   }
 }
-
-This ensures structured communication between backend and client.
-
----
-
-## 3. Folder Structure Explanation
-
-### backend/
-Contains the core application logic.
-
-- api/ → Defines endpoints (routes)
-- services/ → Business logic (OCR processing)
-- database/ → Data models and DB setup
-- main.py → Application entry point
-
----
-
-### docs/
-Contains documentation and system explanation files.
-
----
-
-### tests/
-Contains unit and integration tests.
-
----
-
-### infrastructure/
-Reserved for Docker, monitoring, deployment configurations.
-
----
-
-## 4. Key Technologies Used
-
-- Python 3.11
-- FastAPI (API framework)
-- Uvicorn (ASGI server)
-- Tesseract OCR
-- SQLAlchemy (ORM)
-- SQLite (Database)
-- Pytest (Testing)
-- Git & GitHub (Version control)
-
----
-
-## 5. Why This Architecture Matters
-
-This project follows separation of concerns:
-
-- API layer handles communication
-- Service layer handles logic
-- Database layer handles persistence
-
-This modular structure makes the system:
-- Maintainable
-- Testable
-- Scalable
-- Production-ready
-
----
-
-## 6. Engineering Practices Demonstrated
-
-- Virtual environment isolation
-- Dependency freezing (requirements.txt)
-- Git-based version control
-- Structured commits
-- Clean folder organization
-- Documentation-driven development
-
----
-
-## 7. Future Improvements
-
-- Add document classification model
-- Add entity extraction (dates, totals)
-- Add asynchronous background processing
-- Add frontend UI
-- Add Docker deployment
-
----
-
-## Conclusion
-
-The Intelligent Document Processor demonstrates a complete backend document-processing pipeline using professional software engineering practices.
-
-It reflects understanding of:
-- API architecture
-- File handling
-- OCR integration
-- Database modeling
-- Modular code design
-- Deployment structure
